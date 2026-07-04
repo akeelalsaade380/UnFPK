@@ -1,47 +1,29 @@
-name: Build UnFPK Tool
+name: Build UnFPK with CMake
 
-# هذا الأمر يسمح لك بتشغيل البناء يدوياً متى أردت
 on:
   workflow_dispatch:
+  push:
+    branches: [ "master" ]
 
 jobs:
   build:
-    runs-on: windows-latest # بناء الأداة لتتوافق مع نظام ويندوز لديك
+    runs-on: windows-latest
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # 1. محاولة البناء إذا كان المشروع C# / .NET (يحتوي على ملف .sln أو .csproj)
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x' # متوافق مع الإصدارات الأقدم أيضاً
-    - name: Build .NET Project
-      continue-on-error: true # لكي لا يتوقف البناء إذا لم يكن المشروع C#
-      run: dotnet build --configuration Release
+    - name: Configure CMake
+      # تهيئة ملفات المشروع باستخدام CMake
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 
-    # 2. محاولة البناء إذا كان المشروع C++ (يستخدم MSBuild)
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v2
-    - name: Build MSBuild Project
-      continue-on-error: true
-      run: |
-        $sln = Get-ChildItem -Filter *.sln -Recurse | Select-Object -First 1
-        if ($sln) { msbuild $sln.FullName /p:Configuration=Release }
+    - name: Build Project
+      # ترجمة الكود وبناء الأداة (ملف exe)
+      run: cmake --build build --config Release
 
-    # 3. محاولة البناء إذا كان المشروع Rust (يحتوي على Cargo.toml)
-    - name: Build Rust Project
-      continue-on-error: true
-      run: |
-        if (Test-Path "Cargo.toml") { cargo build --release }
-
-    # 4. تجميع ملفات .exe و .dll الناتجة ورفعها لك لتقوم بتحميلها
     - name: Upload Executable Artifact
+      # سحب الأداة الجاهزة ورفعها لتتمكن من تحميلها
       uses: actions/upload-artifact@v4
       with:
-        name: UnFPK-Ready-To-Use
-        path: |
-          **/*.exe
-          **/*.dll
-        if-no-files-found: warn
+        name: UnFPK-Ready
+        path: build/**/*.exe
