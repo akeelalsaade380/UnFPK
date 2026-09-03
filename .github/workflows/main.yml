@@ -15,11 +15,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        submodules: recursive # خطوة حاسمة لجلب أي مكاتب خارجية (Dependencies) يعتمد عليها الكود
+        submodules: recursive
 
     - name: Configure CMake
-      # استخدام -S . لتأكيد مسار ملفات المصدر وتجنب أخطاء الضبط
-      run: cmake -S . -B build
+      # تمت إضافة -DCMAKE_POLICY_VERSION_MINIMUM=3.5 لتخطي مشكلة الإصدار القديم
+      run: cmake -S . -B build -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
     - name: Build
       run: cmake --build build --config Release
