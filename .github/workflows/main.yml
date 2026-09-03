@@ -1,27 +1,31 @@
-name: Build UnFPK with CMake
+name: Build UnFPK
 
 on:
-  workflow_dispatch:
   push:
     branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  workflow_dispatch: # يتيح لك تشغيل عملية البناء يدوياً متى شئت
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout Code
+    - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Configure CMake
-      # تم إضافة أمر التخطي هنا لحل مشكلة الإصدار القديم
-      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
 
-    - name: Build Project
-      run: cmake --build build --config Release
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config Release
 
-    - name: Upload Executable Artifact
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: UnFPK-Ready
-        path: build/**/*.exe
+        name: UnFPK-Windows
+        # التقاط الملف التنفيذي سواء تم تصديره داخل مجلد Release أو في مجلد البناء الرئيسي
+        path: |
+          ${{github.workspace}}/build/Release/*.exe
+          ${{github.workspace}}/build/*.exe
