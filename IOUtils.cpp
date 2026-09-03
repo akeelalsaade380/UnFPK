@@ -1,5 +1,6 @@
 #include "stdafx.h"
-
+#include <string>
+#include <map>
 
 u8* FileReadAllData( const char* kprgcFileName )
 {
