@@ -18,8 +18,8 @@ jobs:
         submodules: recursive
 
     - name: Configure CMake
-      # تمت إضافة -DCMAKE_POLICY_VERSION_MINIMUM=3.5 لتخطي مشكلة الإصدار القديم
-      run: cmake -S . -B build -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+      # تم وضع علامتي تنصيص حول المعامل لمنع PowerShell من فصل الرقم
+      run: cmake -S . -B build "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
 
     - name: Build
       run: cmake --build build --config Release
